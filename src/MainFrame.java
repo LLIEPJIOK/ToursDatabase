@@ -2,13 +2,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.NumberFormatter;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Panel;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -79,14 +73,14 @@ public class MainFrame extends JFrame implements ActionListener {
     // staff for table
     private static JTable table;
     private static JScrollPane scrollPane;
-    private static final String[] COLUMNS_NAME = { "Tour name", "Client name", "Price per day", "Days", "Fare",
-            "Cost of travel", "Zipped" };
-    private static final int[] COLUMNS_WIDTH = { 100, 140, 110, 60, 60, 110, 60 };
+    private static final String[] COLUMNS_NAME = {"Tour name", "Client name", "Price per day", "Days", "Fare",
+            "Cost of travel", "Zipped"};
+    private static final int[] COLUMNS_WIDTH = {100, 140, 110, 60, 60, 110, 60};
 
     // staff for dialog that adds tours
     private static JDialog addingDialog;
-    private static final String[] ADDING_LABELS = { "Tour name:", "Client name:", "Price per day:", "Days:", "Fare:",
-            "Cost of travel:" };
+    private static final String[] ADDING_LABELS = {"Tour name:", "Client name:", "Price per day:", "Days:", "Fare:",
+            "Cost of travel:"};
     private static JTextField[] addingTextFields = new JTextField[6];
     private static JCheckBox addingCheckBox;
 
@@ -106,6 +100,9 @@ public class MainFrame extends JFrame implements ActionListener {
     private static JComboBox<String> findingComparisonTypeComboBox;
     private static JTextField findingKeyValueTextField;
 
+    // staff for about dialog
+    private static JDialog aboutDialog;
+
     // index for tours
     private static Index idx;
 
@@ -117,6 +114,9 @@ public class MainFrame extends JFrame implements ActionListener {
         this.setLocation(200, 100);
         this.setSize(672, 405);
         this.setResizable(false);
+        Image icon = new ImageIcon("Icons\\Main_Window_icon.png").getImage();
+        this.setIconImage(icon);
+
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -132,6 +132,7 @@ public class MainFrame extends JFrame implements ActionListener {
         createRemovingDialog();
         createSortingDialog();
         createFindingWindow();
+        createAboutDialogWindow();
         createIndex();
 
         // making window visible
@@ -277,7 +278,8 @@ public class MainFrame extends JFrame implements ActionListener {
     private void createAddingDialog() {
         // creating window
         addingDialog = new JDialog(this, "Adding", true);
-
+        Image icon = new ImageIcon("Icons\\Add_Window_icon.png").getImage();
+        addingDialog.setIconImage(icon);
         // creating number formating for text fields
         NumberFormat intFormat = NumberFormat.getInstance();
         NumberFormatter intFormatter = new NumberFormatter(intFormat);
@@ -346,11 +348,14 @@ public class MainFrame extends JFrame implements ActionListener {
     // Creating removing dialog
     private void createRemovingDialog() {
         removingDialog = new JDialog(this, "Removing", true);
+        Image icon = new ImageIcon("Icons\\Remove_Window_icon.png").getImage();
+        removingDialog.setIconImage(icon);
         removingDialog.setLayout(new BorderLayout());
+
 
         JPanel panel = new JPanel(new GridLayout(0, 1));
 
-        String[] items = { "Tour name", "Client name", "Days" };
+        String[] items = {"Tour name", "Client name", "Days"};
         removingComboBox = new JComboBox<>(items);
         removingComboBox.setFont(menuFont);
 
@@ -384,11 +389,13 @@ public class MainFrame extends JFrame implements ActionListener {
     // Creating Sort dialog window
     private void createSortingDialog() {
         sortingDialog = new JDialog(this, "Sorting", true);
+        Image icon = new ImageIcon("Icons\\Sort_Window_icon.png").getImage();
+        sortingDialog.setIconImage(icon);
         sortingDialog.setLayout(new BorderLayout());
 
         JPanel panel = new JPanel(new GridLayout(0, 2));
 
-        String[] items = { "Tour name", "Client name", "Days" };
+        String[] items = {"Tour name", "Client name", "Days"};
         soringComboBox = new JComboBox<>(items);
         soringComboBox.setFont(menuFont);
         sotringCheckBox = new JCheckBox("Reversed");
@@ -416,6 +423,8 @@ public class MainFrame extends JFrame implements ActionListener {
     // Creating finding dialog window
     private void createFindingWindow() {
         findingDialog = new JDialog(this, "Finding", true);
+        Image icon = new ImageIcon("Icons\\Find_Window_icon.png").getImage();
+        findingDialog.setIconImage(icon);
         findingDialog.setLayout(new BorderLayout());
 
         JPanel panel = new JPanel(new GridLayout(0, 2));
@@ -425,8 +434,8 @@ public class MainFrame extends JFrame implements ActionListener {
         chooseLabel.setFont(menuFont);
         findingKeyValueTextField = new JTextField(10);
 
-        findingKeyTypeComboBox = new JComboBox<>(new String[] { "Tour name",
-                "Client name", "Days" });
+        findingKeyTypeComboBox = new JComboBox<>(new String[]{"Tour name",
+                "Client name", "Days"});
         findingKeyTypeComboBox.addActionListener(event -> {
             if ((String) findingKeyTypeComboBox.getSelectedItem() == "Days") {
                 findingKeyValueTextField.addKeyListener(new IntKeyListener());
@@ -436,8 +445,8 @@ public class MainFrame extends JFrame implements ActionListener {
             findingKeyValueTextField.setText("");
         });
 
-        findingComparisonTypeComboBox = new JComboBox<>(new String[] {
-                "<", "==", ">" });
+        findingComparisonTypeComboBox = new JComboBox<>(new String[]{
+                "<", "==", ">"});
 
         panel.add(chooseLabel);
         panel.add(new JPanel());
@@ -464,6 +473,44 @@ public class MainFrame extends JFrame implements ActionListener {
         findingDialog.setLocation(new Point(this.getX() + 120, this.getY() + 120));
         findingDialog.setResizable(false);
         findingDialog.setVisible(false);
+    }
+
+    // creating an About dialog window
+    private static void createAboutDialogWindow() {
+        aboutDialog = new JDialog();
+        Image icon = new ImageIcon("Icons\\About_Window_icon.png").getImage();
+        aboutDialog.setIconImage(icon);
+
+        aboutDialog.setModal(true);
+        aboutDialog.setTitle("Dialog");
+        aboutDialog.setSize(455, 150);
+        aboutDialog.setResizable(false);
+        aboutDialog.setLocationRelativeTo(null);
+
+        JLabel label1 = new JLabel("It's a simple tour database. You can add, sort, find and remove tours.");
+        label1.setFont(menuFont_Italic);
+        label1.setBounds(25,7,500,30);
+
+        JLabel label2 = new JLabel("Prepared by Denis Lebedev and Matthew Kvetko");
+        label2.setFont(menuFont_Italic);
+        label2.setBounds(70,30,500,30);
+
+        JButton okButton = new JButton("OK");
+        okButton.setPreferredSize(new Dimension(100, 40));
+        okButton.setBackground(Color.WHITE);
+        okButton.setForeground(Color.BLACK);
+        okButton.setOpaque(true);
+        okButton.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3, true));
+        okButton.setFocusPainted(false);
+        okButton.setContentAreaFilled(true);
+        okButton.addActionListener(e -> aboutDialog.dispose());
+        okButton.setBounds(150,66,150,36);
+
+        aboutDialog.add(label1);
+        aboutDialog.add(label2);
+        aboutDialog.add(okButton);
+        aboutDialog.add(new JPanel());
+        aboutDialog.setVisible(false);
     }
 
     // creating index
@@ -575,7 +622,7 @@ public class MainFrame extends JFrame implements ActionListener {
             Arrays.sort(poss);
             RandomAccessFile fileBak = new RandomAccessFile(FILE_NAME_BACK, "rw");
             RandomAccessFile file = new RandomAccessFile(FILE_NAME, "rw");
-            boolean[] wasZipped = new boolean[] { false };
+            boolean[] wasZipped = new boolean[]{false};
 
             // rewriting files without "deleting tours"
             long pos;
@@ -634,6 +681,13 @@ public class MainFrame extends JFrame implements ActionListener {
 
     // setting finding
     private void setFinding(ActionEvent event) {
+        // checking empty field
+        if (findingKeyValueTextField.getText().trim().length() == 0) {
+            JOptionPane.showMessageDialog(this,
+                    "Empty fields",
+                    "Information", JOptionPane.PLAIN_MESSAGE);
+            return;
+        }
         switch ((String) findingKeyTypeComboBox.getSelectedItem()) {
             case "Tour name": {
                 showKey = ShowKey.NAME;
@@ -689,8 +743,8 @@ public class MainFrame extends JFrame implements ActionListener {
                 long pos;
                 while ((pos = raf.getFilePointer()) < raf.length()) {
                     Tour tour = getTour(raf, pos);
-                    model.addRow(new Object[] { tour.tourName, tour.clientName, tour.pricePerDay, tour.days, tour.fare,
-                            tour.costOfTravel, tour.isZipped });
+                    model.addRow(new Object[]{tour.tourName, tour.clientName, tour.pricePerDay, tour.days, tour.fare,
+                            tour.costOfTravel, tour.isZipped});
                 }
             } else if (showMod == ShowMod.FIND) {
                 // finding
@@ -708,9 +762,9 @@ public class MainFrame extends JFrame implements ActionListener {
                         for (long pos : poss) {
                             Tour tour = getTour(raf, pos);
                             model.addRow(
-                                    new Object[] { tour.tourName, tour.clientName, tour.pricePerDay, tour.days,
+                                    new Object[]{tour.tourName, tour.clientName, tour.pricePerDay, tour.days,
                                             tour.fare,
-                                            tour.costOfTravel, tour.isZipped });
+                                            tour.costOfTravel, tour.isZipped});
                         }
                     }
                 } else {
@@ -737,9 +791,9 @@ public class MainFrame extends JFrame implements ActionListener {
                         for (long pos : poss) {
                             Tour tour = getTour(raf, pos);
                             model.addRow(
-                                    new Object[] { tour.tourName, tour.clientName, tour.pricePerDay, tour.days,
+                                    new Object[]{tour.tourName, tour.clientName, tour.pricePerDay, tour.days,
                                             tour.fare,
-                                            tour.costOfTravel, tour.isZipped });
+                                            tour.costOfTravel, tour.isZipped});
                         }
                     }
                 }
@@ -759,8 +813,8 @@ public class MainFrame extends JFrame implements ActionListener {
                     for (long pos : poss) {
                         Tour tour = getTour(raf, pos);
                         model.addRow(
-                                new Object[] { tour.tourName, tour.clientName, tour.pricePerDay, tour.days, tour.fare,
-                                        tour.costOfTravel, tour.isZipped });
+                                new Object[]{tour.tourName, tour.clientName, tour.pricePerDay, tour.days, tour.fare,
+                                        tour.costOfTravel, tour.isZipped});
                     }
                 }
             }
@@ -795,7 +849,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     // getting tour using position
     private static Tour getTour(RandomAccessFile raf, long pos) throws ClassNotFoundException, IOException {
-        boolean[] wasZipped = new boolean[] { false };
+        boolean[] wasZipped = new boolean[]{false};
         Tour tour = (Tour) Buffer.readObject(raf, pos, wasZipped);
         tour.setIsZipped(wasZipped[0]);
         return tour;
@@ -908,13 +962,9 @@ public class MainFrame extends JFrame implements ActionListener {
             findingDialog.setVisible(true);
         }
 
-        // hanle about
+        // handle about
         if (event.getSource() == aboutItem) {
-            // showing window with information about programm
-            JOptionPane.showMessageDialog(this,
-                    "It's a simple tour database. You can add, sort, find and delete tours.\n\n" +
-                            "Prepared by Denis Lebedev and Matthew Kvetko",
-                    "About", JOptionPane.PLAIN_MESSAGE);
+            aboutDialog.setVisible(true);
         }
     }
 }
