@@ -21,14 +21,11 @@ import java.util.Comparator;
 public class MainFrame extends JFrame implements ActionListener {
     // staff for showing table
     enum ShowMod {
-        UNSORTED,
-        SORTED,
-        REVERSE_SORTED,
-        FIND
+        UNSORTED, SORTED, REVERSE_SORTED, FIND
     }
 
     enum ShowKey {
-        NAME, FULL_NAME, DAYS
+        TOUR_NAME, CLIENT_NAME, DAYS
     }
 
     enum FindMod {
@@ -36,7 +33,7 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     private static ShowMod showMod = ShowMod.UNSORTED;
-    private static ShowKey showKey = ShowKey.NAME;
+    private static ShowKey showKey = ShowKey.TOUR_NAME;
     private static FindMod findMod = FindMod.EQUAL;
     private static String findingKey;
 
@@ -48,8 +45,9 @@ public class MainFrame extends JFrame implements ActionListener {
     static final String IDX_EXT = "idx";
 
     // Customize staff
+    private static Font headerFont = new Font("Clarendon", Font.BOLD | Font.ITALIC, 15);
     private static Font menuFont = new Font("Clarendon", Font.BOLD, 13);
-    private static Font menuFont_Italic = new Font("Clarendon", Font.BOLD | Font.ITALIC, 12);
+    private static Font menuFontItalic = new Font("Clarendon", Font.BOLD | Font.ITALIC, 12);
     private static Font menuObjectFont = new Font("Clarendon", Font.BOLD | Font.ITALIC, 11);
 
     // some menuBar staff
@@ -70,17 +68,25 @@ public class MainFrame extends JFrame implements ActionListener {
     private static JMenu helpMenu;
     private static JMenuItem aboutItem;
 
+    // status bar
+    private static JLabel statusLabel;
+
+    // header staff
+    private static JLabel headerLabel;
+    private static final String[] headersNames = { "All books unsorted:", "All books sorted by ",
+            "All books reverse sorted by ", "All books with " };
+
     // staff for table
     private static JTable table;
     private static JScrollPane scrollPane;
-    private static final String[] COLUMNS_NAME = {"Tour name", "Client name", "Price per day", "Days", "Fare",
-            "Cost of travel", "Zipped"};
-    private static final int[] COLUMNS_WIDTH = {100, 140, 110, 60, 60, 110, 60};
+    private static final String[] COLUMNS_NAME = { "Tour name", "Client name", "Price per day", "Days", "Fare",
+            "Cost of travel", "Zipped" };
+    private static final int[] COLUMNS_WIDTH = { 100, 140, 110, 60, 80, 110, 60 };
 
     // staff for dialog that adds tours
     private static JDialog addingDialog;
-    private static final String[] ADDING_LABELS = {"Tour name:", "Client name:", "Price per day:", "Days:", "Fare:",
-            "Cost of travel:"};
+    private static final String[] ADDING_LABELS = { "Tour name:", "Client name:", "Price per day:", "Days:", "Fare:",
+            "Cost of travel:" };
     private static JTextField[] addingTextFields = new JTextField[6];
     private static JCheckBox addingCheckBox;
 
@@ -112,7 +118,7 @@ public class MainFrame extends JFrame implements ActionListener {
         this.setTitle("Tours database");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocation(200, 100);
-        this.setSize(672, 405);
+        this.setSize(692, 405);
         this.setResizable(false);
         Image icon = new ImageIcon("Icons\\Main_Window_icon.png").getImage();
         this.setIconImage(icon);
@@ -126,7 +132,9 @@ public class MainFrame extends JFrame implements ActionListener {
         });
 
         // creating staff
+        createHeader();
         createTable();
+        createStatusBar();
         createMenus();
         createAddingDialog();
         createRemovingDialog();
@@ -139,6 +147,19 @@ public class MainFrame extends JFrame implements ActionListener {
         this.setVisible(true);
     }
 
+    // creating header
+    private void createHeader() {
+        headerLabel = new JLabel("", SwingConstants.CENTER);
+        headerLabel.setFont(headerFont);
+        headerLabel.setBounds(0, 0, 692, 20);
+        headerLabel.setBackground(new Color(224, 255, 255));
+        headerLabel.setOpaque(true);
+        headerLabel.setForeground(Color.BLACK);
+        headerLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+        this.add(headerLabel, BorderLayout.NORTH);
+    }
+
     // creating table
     private void createTable() {
         table = new JTable();
@@ -148,7 +169,6 @@ public class MainFrame extends JFrame implements ActionListener {
         table.setEnabled(false);
         table.getTableHeader().setResizingAllowed(false);
         table.getTableHeader().setReorderingAllowed(false);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setFont(menuFont);
 
         // creating ScrollPane
@@ -158,10 +178,24 @@ public class MainFrame extends JFrame implements ActionListener {
         scrollPane.setBackground(new Color(224, 255, 255));
         JViewport viewport = scrollPane.getViewport();
         viewport.setBackground(new Color(224, 255, 255));
+
+        // updating table
         updateTable();
 
         // adding scrollPane
         this.add(scrollPane);
+    }
+
+    // creating status bar
+    private void createStatusBar() {
+        statusLabel = new JLabel("Press Alt+x to exit");
+        statusLabel.setFont(menuFontItalic);
+        statusLabel.setBackground(new Color(224, 255, 255));
+        statusLabel.setOpaque(true);
+        statusLabel.setForeground(Color.BLACK);
+        statusLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+
+        this.add(statusLabel, BorderLayout.SOUTH);
     }
 
     // creating menu
@@ -173,8 +207,14 @@ public class MainFrame extends JFrame implements ActionListener {
         fileMenu = new JMenu("File");
         openItem = new JMenuItem("Open");
         exitItem = new JMenuItem("Exit");
+
+        // adding action listeners
         openItem.addActionListener(this);
         exitItem.addActionListener(this);
+
+        // adding mouse listener
+        openItem.addMouseListener(new MyMouseAdapter("Choose a file to work with", statusLabel));
+        exitItem.addMouseListener(new MyMouseAdapter("Exit from application", statusLabel));
 
         // customize fileMenu
         fileMenu.setFont(menuFont);
@@ -202,6 +242,22 @@ public class MainFrame extends JFrame implements ActionListener {
         showSortedItem = new JMenuItem("Show sorted");
         findItem = new JMenuItem("Find");
 
+        // adding adciton listeners
+        addItem.addActionListener(this);
+        removeItem.addActionListener(this);
+        clearDataItem.addActionListener(this);
+        showItem.addActionListener(this);
+        showSortedItem.addActionListener(this);
+        findItem.addActionListener(this);
+
+        // adding mouse listener
+        addItem.addMouseListener(new MyMouseAdapter("Add a new book", statusLabel));
+        removeItem.addMouseListener(new MyMouseAdapter("Remove an existing book by key", statusLabel));
+        clearDataItem.addMouseListener(new MyMouseAdapter("Clear all tours data", statusLabel));
+        showItem.addMouseListener(new MyMouseAdapter("Show all books unsorted", statusLabel));
+        showSortedItem.addMouseListener(new MyMouseAdapter("Show all books sorted by key", statusLabel));
+        findItem.addMouseListener(new MyMouseAdapter("Find and show books by key", statusLabel));
+
         // customize commandMenu
         commandMenu.setFont(menuFont);
         addItem.setFont(menuObjectFont);
@@ -226,14 +282,6 @@ public class MainFrame extends JFrame implements ActionListener {
         findItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.ALT_DOWN_MASK));
         findItem.setMnemonic('F');
 
-        // adding adciton listeners
-        addItem.addActionListener(this);
-        removeItem.addActionListener(this);
-        clearDataItem.addActionListener(this);
-        showItem.addActionListener(this);
-        showSortedItem.addActionListener(this);
-        findItem.addActionListener(this);
-
         // adding items to the commandMenu
         commandMenu.add(addItem);
         commandMenu.addSeparator();
@@ -249,6 +297,12 @@ public class MainFrame extends JFrame implements ActionListener {
         helpMenu = new JMenu("Help");
         aboutItem = new JMenuItem("About");
 
+        // adding items to the commandMenu
+        aboutItem.addActionListener(this);
+
+        // adding mouse listener
+        aboutItem.addMouseListener(new MyMouseAdapter("Show the information about the application", statusLabel));
+
         // customize helpMenu
         helpMenu.setFont(menuFont);
         aboutItem.setFont(menuObjectFont);
@@ -257,9 +311,6 @@ public class MainFrame extends JFrame implements ActionListener {
         helpMenu.setMnemonic('H');
         aboutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.ALT_DOWN_MASK));
         aboutItem.setMnemonic('b');
-
-        // adding items to the commandMenu
-        aboutItem.addActionListener(this);
 
         // adding items to the helpMenu
         helpMenu.add(aboutItem);
@@ -271,7 +322,6 @@ public class MainFrame extends JFrame implements ActionListener {
 
         // setting menuBar
         this.setJMenuBar(menuBar);
-
     }
 
     // creating dialog for adding tours
@@ -313,7 +363,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 addingTextFields[i].addKeyListener(new DoubleKeyListener());
             }
 
-            addingTextFields[i].setFont(menuFont_Italic);
+            addingTextFields[i].setFont(menuFontItalic);
             addingTextFields[i].setBounds(130, 10 + i * 25, 140, 20);
 
             addingDialog.add(l);
@@ -352,10 +402,9 @@ public class MainFrame extends JFrame implements ActionListener {
         removingDialog.setIconImage(icon);
         removingDialog.setLayout(new BorderLayout());
 
-
         JPanel panel = new JPanel(new GridLayout(0, 1));
 
-        String[] items = {"Tour name", "Client name", "Days"};
+        String[] items = { "Tour name", "Client name", "Days" };
         removingComboBox = new JComboBox<>(items);
         removingComboBox.setFont(menuFont);
 
@@ -364,7 +413,7 @@ public class MainFrame extends JFrame implements ActionListener {
         row.add(removingComboBox);
 
         removingTextField = new JTextField(10);
-        removingTextField.setFont(menuFont_Italic);
+        removingTextField.setFont(menuFontItalic);
         row.add(removingTextField);
         panel.add(row);
 
@@ -395,7 +444,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
         JPanel panel = new JPanel(new GridLayout(0, 2));
 
-        String[] items = {"Tour name", "Client name", "Days"};
+        String[] items = { "Tour name", "Client name", "Days" };
         soringComboBox = new JComboBox<>(items);
         soringComboBox.setFont(menuFont);
         sotringCheckBox = new JCheckBox("Reversed");
@@ -434,8 +483,8 @@ public class MainFrame extends JFrame implements ActionListener {
         chooseLabel.setFont(menuFont);
         findingKeyValueTextField = new JTextField(10);
 
-        findingKeyTypeComboBox = new JComboBox<>(new String[]{"Tour name",
-                "Client name", "Days"});
+        findingKeyTypeComboBox = new JComboBox<>(new String[] { "Tour name",
+                "Client name", "Days" });
         findingKeyTypeComboBox.addActionListener(event -> {
             if ((String) findingKeyTypeComboBox.getSelectedItem() == "Days") {
                 findingKeyValueTextField.addKeyListener(new IntKeyListener());
@@ -445,8 +494,8 @@ public class MainFrame extends JFrame implements ActionListener {
             findingKeyValueTextField.setText("");
         });
 
-        findingComparisonTypeComboBox = new JComboBox<>(new String[]{
-                "<", "==", ">"});
+        findingComparisonTypeComboBox = new JComboBox<>(new String[] {
+                "<", "==", ">" });
 
         panel.add(chooseLabel);
         panel.add(new JPanel());
@@ -476,24 +525,22 @@ public class MainFrame extends JFrame implements ActionListener {
     }
 
     // creating an About dialog window
-    private static void createAboutDialogWindow() {
-        aboutDialog = new JDialog();
+    private void createAboutDialogWindow() {
+        aboutDialog = new JDialog(this, "About", true);
         Image icon = new ImageIcon("Icons\\About_Window_icon.png").getImage();
         aboutDialog.setIconImage(icon);
-
-        aboutDialog.setModal(true);
         aboutDialog.setTitle("Dialog");
         aboutDialog.setSize(455, 150);
         aboutDialog.setResizable(false);
         aboutDialog.setLocationRelativeTo(null);
 
         JLabel label1 = new JLabel("It's a simple tour database. You can add, sort, find and remove tours.");
-        label1.setFont(menuFont_Italic);
-        label1.setBounds(25,7,500,30);
+        label1.setFont(menuFontItalic);
+        label1.setBounds(25, 7, 500, 30);
 
         JLabel label2 = new JLabel("Prepared by Denis Lebedev and Matthew Kvetko");
-        label2.setFont(menuFont_Italic);
-        label2.setBounds(70,30,500,30);
+        label2.setFont(menuFontItalic);
+        label2.setBounds(145, 30, 500, 30);
 
         JButton okButton = new JButton("OK");
         okButton.setPreferredSize(new Dimension(100, 40));
@@ -504,7 +551,7 @@ public class MainFrame extends JFrame implements ActionListener {
         okButton.setFocusPainted(false);
         okButton.setContentAreaFilled(true);
         okButton.addActionListener(e -> aboutDialog.dispose());
-        okButton.setBounds(150,66,150,36);
+        okButton.setBounds(150, 66, 150, 36);
 
         aboutDialog.add(label1);
         aboutDialog.add(label2);
@@ -622,7 +669,7 @@ public class MainFrame extends JFrame implements ActionListener {
             Arrays.sort(poss);
             RandomAccessFile fileBak = new RandomAccessFile(FILE_NAME_BACK, "rw");
             RandomAccessFile file = new RandomAccessFile(FILE_NAME, "rw");
-            boolean[] wasZipped = new boolean[]{false};
+            boolean[] wasZipped = new boolean[] { false };
 
             // rewriting files without "deleting tours"
             long pos;
@@ -654,7 +701,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private void setSorting(ActionEvent event) {
         switch ((String) soringComboBox.getSelectedItem()) {
             case "Tour name": {
-                showKey = ShowKey.NAME;
+                showKey = ShowKey.TOUR_NAME;
                 break;
             }
             case "Days": {
@@ -662,7 +709,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 break;
             }
             case "Client name": {
-                showKey = ShowKey.FULL_NAME;
+                showKey = ShowKey.CLIENT_NAME;
                 break;
             }
         }
@@ -690,7 +737,7 @@ public class MainFrame extends JFrame implements ActionListener {
         }
         switch ((String) findingKeyTypeComboBox.getSelectedItem()) {
             case "Tour name": {
-                showKey = ShowKey.NAME;
+                showKey = ShowKey.TOUR_NAME;
                 break;
             }
             case "Days": {
@@ -698,7 +745,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 break;
             }
             case "Client name": {
-                showKey = ShowKey.FULL_NAME;
+                showKey = ShowKey.CLIENT_NAME;
                 break;
             }
         }
@@ -728,6 +775,55 @@ public class MainFrame extends JFrame implements ActionListener {
 
     }
 
+    // updating header
+    private void updateHeader() {
+        // key for showing if sorting
+        String key = "";
+        switch (showKey) {
+            case TOUR_NAME:
+                key = "tour name";
+                break;
+            case CLIENT_NAME:
+                key = "client name";
+                break;
+            case DAYS:
+                key = "days";
+                break;
+        }
+
+        // comparasiong mod for showing if finding
+        String comp = "";
+        switch (findMod) {
+            case LESS:
+                comp = " less than ";
+                break;
+            case EQUAL:
+                comp = " equal to ";
+                break;
+            case GREATER:
+                comp = " greater than ";
+                break;
+        }
+
+        // setting text
+        switch (showMod) {
+            case UNSORTED:
+                headerLabel.setText(headersNames[0]);
+                break;
+            case SORTED:
+                headerLabel.setText(headersNames[1] + key + ":");
+                break;
+            case REVERSE_SORTED:
+                headerLabel.setText(headersNames[2] + key + ":");
+                break;
+            case FIND:
+                headerLabel.setText(headersNames[3] + key + comp + findingKey);
+                break;
+            default:
+                break;
+        }
+    }
+
     // updating table
     private void updateTable() {
         try {
@@ -743,8 +839,8 @@ public class MainFrame extends JFrame implements ActionListener {
                 long pos;
                 while ((pos = raf.getFilePointer()) < raf.length()) {
                     Tour tour = getTour(raf, pos);
-                    model.addRow(new Object[]{tour.tourName, tour.clientName, tour.pricePerDay, tour.days, tour.fare,
-                            tour.costOfTravel, tour.isZipped});
+                    model.addRow(new Object[] { tour.tourName, tour.clientName, tour.pricePerDay, tour.days, tour.fare,
+                            tour.costOfTravel, tour.isZipped });
                 }
             } else if (showMod == ShowMod.FIND) {
                 // finding
@@ -762,9 +858,9 @@ public class MainFrame extends JFrame implements ActionListener {
                         for (long pos : poss) {
                             Tour tour = getTour(raf, pos);
                             model.addRow(
-                                    new Object[]{tour.tourName, tour.clientName, tour.pricePerDay, tour.days,
+                                    new Object[] { tour.tourName, tour.clientName, tour.pricePerDay, tour.days,
                                             tour.fare,
-                                            tour.costOfTravel, tour.isZipped});
+                                            tour.costOfTravel, tour.isZipped });
                         }
                     }
                 } else {
@@ -791,9 +887,9 @@ public class MainFrame extends JFrame implements ActionListener {
                         for (long pos : poss) {
                             Tour tour = getTour(raf, pos);
                             model.addRow(
-                                    new Object[]{tour.tourName, tour.clientName, tour.pricePerDay, tour.days,
+                                    new Object[] { tour.tourName, tour.clientName, tour.pricePerDay, tour.days,
                                             tour.fare,
-                                            tour.costOfTravel, tour.isZipped});
+                                            tour.costOfTravel, tour.isZipped });
                         }
                     }
                 }
@@ -813,8 +909,8 @@ public class MainFrame extends JFrame implements ActionListener {
                     for (long pos : poss) {
                         Tour tour = getTour(raf, pos);
                         model.addRow(
-                                new Object[]{tour.tourName, tour.clientName, tour.pricePerDay, tour.days, tour.fare,
-                                        tour.costOfTravel, tour.isZipped});
+                                new Object[] { tour.tourName, tour.clientName, tour.pricePerDay, tour.days, tour.fare,
+                                        tour.costOfTravel, tour.isZipped });
                     }
                 }
             }
@@ -824,6 +920,9 @@ public class MainFrame extends JFrame implements ActionListener {
             for (int i = 0; i < COLUMNS_WIDTH.length; ++i) {
                 table.getColumnModel().getColumn(i).setPreferredWidth(COLUMNS_WIDTH[i]);
             }
+
+            // updating header
+            updateHeader();
 
             // clear after using
             raf.close();
@@ -838,9 +937,9 @@ public class MainFrame extends JFrame implements ActionListener {
     // getting indexBase using showKey
     private IndexBase getIndexBase() {
         IndexBase pidx = null;
-        if (showKey == ShowKey.NAME) {
+        if (showKey == ShowKey.TOUR_NAME) {
             pidx = idx.names;
-        } else if (showKey == ShowKey.FULL_NAME) {
+        } else if (showKey == ShowKey.CLIENT_NAME) {
             pidx = idx.fullNames;
         } else
             pidx = idx.days;
@@ -849,7 +948,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
     // getting tour using position
     private static Tour getTour(RandomAccessFile raf, long pos) throws ClassNotFoundException, IOException {
-        boolean[] wasZipped = new boolean[]{false};
+        boolean[] wasZipped = new boolean[] { false };
         Tour tour = (Tour) Buffer.readObject(raf, pos, wasZipped);
         tour.setIsZipped(wasZipped[0]);
         return tour;
