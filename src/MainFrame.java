@@ -1,7 +1,6 @@
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.text.NumberFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,8 +11,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -330,22 +327,6 @@ public class MainFrame extends JFrame implements ActionListener {
         addingDialog = new JDialog(this, "Adding", true);
         Image icon = new ImageIcon("Icons\\Add_Window_icon.png").getImage();
         addingDialog.setIconImage(icon);
-        // creating number formating for text fields
-        NumberFormat intFormat = NumberFormat.getInstance();
-        NumberFormatter intFormatter = new NumberFormatter(intFormat);
-        intFormatter.setValueClass(Integer.class);
-        intFormatter.setMinimum(0);
-        intFormatter.setMaximum(1000000000);
-        intFormatter.setAllowsInvalid(false);
-
-        NumberFormat decFormat = DecimalFormat.getInstance();
-        decFormat.setMinimumFractionDigits(2);
-        decFormat.setMaximumFractionDigits(2);
-        NumberFormatter doubleFormatter = new NumberFormatter(decFormat);
-        doubleFormatter.setValueClass(Double.class);
-        doubleFormatter.setMinimum(0.0);
-        doubleFormatter.setMaximum(1000000000.0);
-        doubleFormatter.setAllowsInvalid(false);
 
         // creating and locate elements
         for (int i = 0; i < 6; ++i) {
