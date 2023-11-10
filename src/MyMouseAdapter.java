@@ -1,8 +1,8 @@
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.JLabel;
 
+// class for handling mouse events
 class MyMouseAdapter extends MouseAdapter {
     // staff for changing label text
     final String enteredText;
