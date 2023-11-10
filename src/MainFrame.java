@@ -529,18 +529,17 @@ public class MainFrame extends JFrame implements ActionListener {
         aboutDialog = new JDialog(this, "About", true);
         Image icon = new ImageIcon("Icons\\About_Window_icon.png").getImage();
         aboutDialog.setIconImage(icon);
-        aboutDialog.setTitle("Dialog");
         aboutDialog.setSize(455, 150);
         aboutDialog.setResizable(false);
         aboutDialog.setLocationRelativeTo(null);
 
-        JLabel label1 = new JLabel("It's a simple tour database. You can add, sort, find and remove tours.");
+        JLabel label1 = new JLabel("It's a simple tour database. You can add, sort, find and remove tours");
         label1.setFont(menuFontItalic);
         label1.setBounds(25, 7, 500, 30);
 
         JLabel label2 = new JLabel("Prepared by Denis Lebedev and Matthew Kvetko");
         label2.setFont(menuFontItalic);
-        label2.setBounds(145, 30, 500, 30);
+        label2.setBounds(95, 30, 500, 30);
 
         JButton okButton = new JButton("OK");
         okButton.setPreferredSize(new Dimension(100, 40));
