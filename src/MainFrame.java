@@ -395,7 +395,7 @@ public class MainFrame extends JFrame implements ActionListener {
         addingDialog.setResizable(false);
     }
 
-    // Creating removing dialog
+    // creating removing dialog
     private void createRemovingDialog() {
         removingDialog = new JDialog(this, "Removing", true);
         Image icon = new ImageIcon("Icons\\Remove_Window_icon.png").getImage();
@@ -404,16 +404,24 @@ public class MainFrame extends JFrame implements ActionListener {
 
         JPanel panel = new JPanel(new GridLayout(0, 1));
 
+        removingTextField = new JTextField(10);
+        removingTextField.setFont(menuFontItalic);
+
         String[] items = { "Tour name", "Client name", "Days" };
         removingComboBox = new JComboBox<>(items);
         removingComboBox.setFont(menuFont);
+        removingComboBox.addActionListener(event -> {
+            if ((String) removingComboBox.getSelectedItem() == "Days") {
+                removingTextField.addKeyListener(new IntKeyListener());
+            } else {
+                removingTextField.addKeyListener(null);
+            }
+            removingTextField.setText("");
+        });
 
         JPanel row = new JPanel();
         row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
         row.add(removingComboBox);
-
-        removingTextField = new JTextField(10);
-        removingTextField.setFont(menuFontItalic);
         row.add(removingTextField);
         panel.add(row);
 
@@ -435,7 +443,7 @@ public class MainFrame extends JFrame implements ActionListener {
         removingDialog.setVisible(false);
     }
 
-    // Creating Sort dialog window
+    // Creating sorting dialog window
     private void createSortingDialog() {
         sortingDialog = new JDialog(this, "Sorting", true);
         Image icon = new ImageIcon("Icons\\Sort_Window_icon.png").getImage();
@@ -688,6 +696,9 @@ public class MainFrame extends JFrame implements ActionListener {
             file.close();
             removingTextField.setText("");
             removingDialog.setVisible(false);
+        } catch (NullPointerException e) {
+            // haven't got such tour
+            removingDialog.setVisible(false);
         } catch (Exception e) {
             // some exception
             JOptionPane.showMessageDialog(this,
@@ -816,7 +827,7 @@ public class MainFrame extends JFrame implements ActionListener {
                 headerLabel.setText(headersNames[2] + key + ":");
                 break;
             case FIND:
-                headerLabel.setText(headersNames[3] + key + comp + findingKey);
+                headerLabel.setText(headersNames[3] + key + comp + findingKey + ":");
                 break;
             default:
                 break;
